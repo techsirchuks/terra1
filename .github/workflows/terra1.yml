@@ -1,0 +1,14 @@
+name: Push Notification
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print success message
+        run: echo "Push successful! 🎉"
