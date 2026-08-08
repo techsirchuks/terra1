@@ -19,4 +19,25 @@ resource "azurerm_resource_group" "terra1" {
   location = "southafricanorth"
 }
 
-#testing 
+#Here's our vnet
+resource "azurerm_virtual_network" "terra1-vnet" {
+  name                = "terra1-vnet"
+  location            = azurerm_resource_group.terra1.location
+  resource_group_name = azurerm_resource_group.terra1.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+#Here's our subnet
+resource "azurerm_subnet" "terra1-subnet" {
+  name                 = "terra1-subnet"
+  resource_group_name  = azurerm_resource_group.terra1.name
+  virtual_network_name = azurerm_virtual_network.terra1-vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+#here is our NSG
+resource "azurerm_network_security_group" "frontend-nsg" {
+  name                = "frontend-nsg"
+  location            = azurerm_resource_group.terra1.location
+  resource_group_name = azurerm_resource_group.terra1.name
+}
