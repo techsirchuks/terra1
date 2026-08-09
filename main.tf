@@ -41,3 +41,33 @@ resource "azurerm_network_security_group" "frontend-nsg" {
   location            = azurerm_resource_group.terra1.location
   resource_group_name = azurerm_resource_group.terra1.name
 }
+
+#NSG for allowing port 80
+resource "azurerm_network_security_rule" "allow-http" {
+  name                        = "allow-http"
+  priority                    = "100"
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "80"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.terra1.name
+  network_security_group_name = azurerm_network_security_group.frontend-nsg.name
+}
+
+#NSG for opening port 22
+resource "azurerm_network_security_rule" "allow-ssh" {
+  name                        = "allow-ssh"
+  priority                    = "110"
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "22"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.terra1.name
+  network_security_group_name = azurerm_network_security_group.frontend-nsg.name
+}
