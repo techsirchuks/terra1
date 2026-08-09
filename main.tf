@@ -8,15 +8,15 @@ terraform {
 }
 
 provider "azurerm" {
-   subscription_id = var.subscription_id
-   features {}
+  features {}
+  subscription_id = var.sub-id
 }
 
 
 #Here's our resource group
 resource "azurerm_resource_group" "terra1" {
-  name     = var.terra-rg 
-  location = "southafricanorth"
+  name     = var.terra-rg
+  location = var.location
 }
 
 #Here's our vnet
