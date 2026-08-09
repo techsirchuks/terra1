@@ -121,6 +121,7 @@ resource "azurerm_network_interface" "terra1-nic" {
     name                          = "terra-ip"
     subnet_id                     = azurerm_subnet.terra1-subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.terra1-ip.id
   }
 }
 
@@ -128,4 +129,33 @@ resource "azurerm_network_interface" "terra1-nic" {
 resource "azurerm_network_interface_security_group_association" "terra1-nic-asso" {
   network_interface_id      = azurerm_network_interface.terra1-nic.id
   network_security_group_id = azurerm_network_security_group.frontend-nsg.id
+}
+
+#Here's our Linux VM
+resource "azurerm_linux_virtual_machine" "terra1-vm" {
+  name                = "terra1-vm"
+  resource_group_name = azurerm_resource_group.terra1.name
+  location            = azurerm_resource_group.terra1.location
+  size                = "Standard_B2ts_v2"
+  admin_username      = "adminuser"
+  network_interface_ids = [
+    azurerm_network_interface.terra1-nic.id
+  ]
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "Ubuntu-24_04-LTS"
+    sku       = "server"
+    version   = "latest"
+  }
 }
