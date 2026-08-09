@@ -57,6 +57,21 @@ resource "azurerm_network_security_rule" "allow-http" {
   network_security_group_name = azurerm_network_security_group.frontend-nsg.name
 }
 
+#NSG rule for port 443
+resource "azurerm_network_security_rule" "allow-https" {
+  name                        = "allow-https"
+  priority                    = "200"
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "443"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.terra1.name
+  network_security_group_name = azurerm_network_security_group.frontend-nsg.name
+}
+
 #NSG for opening port 22
 resource "azurerm_network_security_rule" "allow-ssh" {
   name                        = "allow-ssh"
@@ -70,4 +85,47 @@ resource "azurerm_network_security_rule" "allow-ssh" {
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.terra1.name
   network_security_group_name = azurerm_network_security_group.frontend-nsg.name
+}
+
+#NSG for allowing port 80
+resource "azurerm_network_security_rule" "deny-all" {
+  name                        = "deny-all"
+  priority                    = "4096"
+  direction                   = "Inbound"
+  access                      = "Deny"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.terra1.name
+  network_security_group_name = azurerm_network_security_group.frontend-nsg.name
+}
+
+#Here's our Public IP
+resource "azurerm_public_ip" "terra1-ip" {
+  name                = "terra1-ip"
+  resource_group_name = azurerm_resource_group.terra1.name
+  location            = azurerm_resource_group.terra1.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+#Network INterface card (NIC)
+resource "azurerm_network_interface" "terra1-nic" {
+  name                = "terra1-nic"
+  location            = azurerm_resource_group.terra1.location
+  resource_group_name = azurerm_resource_group.terra1.name
+
+  ip_configuration {
+    name                          = "terra-ip"
+    subnet_id                     = azurerm_subnet.terra1-subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+#Let's link our NIC with our NSG
+resource "azurerm_network_interface_security_group_association" "terra1-nic-asso" {
+  network_interface_id      = azurerm_network_interface.terra1-nic.id
+  network_security_group_id = azurerm_network_security_group.frontend-nsg.id
 }
