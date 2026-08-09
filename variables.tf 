@@ -1,0 +1,12 @@
+variable "subscription_id" {
+    description = "my sub-id"
+    type = string
+    sensitive = true
+}
+
+variable "terra-rg" {
+  description = "The decoy name of our resource group"
+  type = string
+  default = "terra1"
+}
+

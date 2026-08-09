@@ -8,14 +8,14 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
-  subscription_id = "fb5254d0-da10-4428-ae41-85602fe2931c"
+   subscription_id = var.subscription_id
+   features {}
 }
 
 
 #Here's our resource group
 resource "azurerm_resource_group" "terra1" {
-  name     = "terra1"
+  name     = var.terra-rg 
   location = "southafricanorth"
 }
 
