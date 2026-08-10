@@ -21,18 +21,18 @@ resource "azurerm_resource_group" "terra1" {
 
 #Here's our vnet
 resource "azurerm_virtual_network" "terra1-vnet" {
-  name                = "terra1-vnet"
-  location            = azurerm_resource_group.terra1.location
-  resource_group_name = azurerm_resource_group.terra1.name
-  address_space       = ["10.0.0.0/16"]
+  name                = var.vnet-name
+  location            = var.location
+  resource_group_name = var.terra-rg
+  address_space       = var.vnet-address
 }
 
 #Here's our subnet
 resource "azurerm_subnet" "terra1-subnet" {
-  name                 = "terra1-subnet"
-  resource_group_name  = azurerm_resource_group.terra1.name
-  virtual_network_name = azurerm_virtual_network.terra1-vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
+  name                 = var.snet-name
+  resource_group_name  = var.terra-rg 
+  virtual_network_name = var.vnet-name 
+  address_prefixes     = var.snet-address 
 }
 
 #here is our NSG
