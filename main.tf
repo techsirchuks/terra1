@@ -38,8 +38,8 @@ resource "azurerm_subnet" "terra1-subnet" {
 #here is our NSG
 resource "azurerm_network_security_group" "frontend-nsg" {
   name                = "frontend-nsg"
-  location            = azurerm_resource_group.terra1.location
-  resource_group_name = azurerm_resource_group.terra1.name
+  location            = var.location 
+  resource_group_name = var.terra-rg
 }
 
 #NSG for allowing port 80
@@ -53,7 +53,7 @@ resource "azurerm_network_security_rule" "allow-http" {
   destination_port_range      = "80"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.terra1.name
+  resource_group_name         = var.terra-rg
   network_security_group_name = azurerm_network_security_group.frontend-nsg.name
 }
 
@@ -68,7 +68,7 @@ resource "azurerm_network_security_rule" "allow-https" {
   destination_port_range      = "443"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.terra1.name
+  resource_group_name         = var.terra-rg
   network_security_group_name = azurerm_network_security_group.frontend-nsg.name
 }
 
@@ -83,7 +83,7 @@ resource "azurerm_network_security_rule" "allow-ssh" {
   destination_port_range      = "22"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.terra1.name
+  resource_group_name         = var.terra-rg
   network_security_group_name = azurerm_network_security_group.frontend-nsg.name
 }
 
@@ -98,15 +98,15 @@ resource "azurerm_network_security_rule" "deny-all" {
   destination_port_range      = "*"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.terra1.name
+  resource_group_name         = var.terra-rg
   network_security_group_name = azurerm_network_security_group.frontend-nsg.name
 }
 
 #Here's our Public IP
 resource "azurerm_public_ip" "terra1-ip" {
   name                = "terra1-ip"
-  resource_group_name = azurerm_resource_group.terra1.name
-  location            = azurerm_resource_group.terra1.location
+  resource_group_name = var.terra-rg
+  location            = var.location
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -114,9 +114,8 @@ resource "azurerm_public_ip" "terra1-ip" {
 #Network INterface card (NIC)
 resource "azurerm_network_interface" "terra1-nic" {
   name                = "terra1-nic"
-  location            = azurerm_resource_group.terra1.location
-  resource_group_name = azurerm_resource_group.terra1.name
-
+  location            = var.location
+  resource_group_name = var.terra-rg
   ip_configuration {
     name                          = "terra-ip"
     subnet_id                     = azurerm_subnet.terra1-subnet.id
@@ -134,8 +133,8 @@ resource "azurerm_network_interface_security_group_association" "terra1-nic-asso
 #Here's our Linux VM
 resource "azurerm_linux_virtual_machine" "terra1-vm" {
   name                = "terra1-vm"
-  resource_group_name = azurerm_resource_group.terra1.name
-  location            = azurerm_resource_group.terra1.location
+  resource_group_name = var.terra-rg
+  location            = var.location
   size                = "Standard_B2ts_v2"
   admin_username      = "adminuser"
   network_interface_ids = [
